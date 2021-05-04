@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigation } from '@react-navigation/core';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import {
 	SafeAreaView,
@@ -8,7 +9,8 @@ import {
 	TextInput,
 	View,
 	KeyboardAvoidingView,
-	Platform
+	Platform,
+	Alert
 } from 'react-native';
 
 import { Button } from '../components/Button';
@@ -22,6 +24,14 @@ export function UserIndentification(){
 	const [name, setName] = useState<string>();
 	const navigation = useNavigation();
 
+	useEffect(() => {
+		async function nameExists(){
+			const nameExists = await AsyncStorage.getItem('@plantmanager:user');
+			setName(nameExists || '');
+		}
+
+		nameExists();
+	}, []);
 	function handleInputBlur(){
 		setIsFocused(false);
 		setIsFilled(!!name);
@@ -35,7 +45,11 @@ export function UserIndentification(){
 		setName(value);
 	}
 
-	function handleSubmit(){
+	async function handleSubmit(){
+		if(!name){
+			return Alert.alert('Me diz como chamar você 🥲');
+		}
+		await AsyncStorage.setItem('@plantmanager:user', name);
 		navigation.navigate('Confirmation');
 	}
 	return (
@@ -66,6 +80,7 @@ export function UserIndentification(){
 							onBlur={handleInputBlur}
 							onFocus={handleInputFocus}
 							onChangeText={handleInputChange}
+							value={name}
 							/>
 						<View style={styles.footer}>
 							<Button

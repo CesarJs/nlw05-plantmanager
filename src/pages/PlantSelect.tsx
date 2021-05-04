@@ -6,15 +6,16 @@ import {
 	FlatList,
 	ActivityIndicator
  } from 'react-native';
-import { EviromentButton } from '../components/EviromentButton';
+ import { useNavigation } from '@react-navigation/core';
 
+import { EviromentButton } from '../components/EviromentButton';
 import { Header } from '../components/Header';
 import { PlantCartPrimary } from '../components/PlantCardPrimary';
 import { Load } from '../components/Load';
+
 import api from '../services/api';
 import colors from '../styles/colors';
 import fonts from '../styles/fonts';
-import { color } from 'react-native-reanimated';
 
 interface EnviromentProps {
 	key: string;
@@ -42,7 +43,8 @@ export function PlantSelect(){
 
 	const [page, setPage] = useState(1);
 	const [loadingMore, setLoadingMore] = useState(true);
-	const [loadedAll, setLoadedAll] = useState(false);
+
+	const navigation = useNavigation();
 
 	function handleEnviromentSelected(enviroment: string){
 
@@ -80,6 +82,11 @@ export function PlantSelect(){
 		}
 		setLoading(false);
 		setLoadingMore(false);
+	}
+
+	function handlePlantSelect(plant: PlantsProps) {
+
+		navigation.navigate('PlantSave', { plant });
 	}
 	useEffect(() => {
 		async function fechEnviroment(){
@@ -120,6 +127,7 @@ export function PlantSelect(){
 			<View>
 				<FlatList
 					data={enviroments}
+					keyExtractor={(item) => String(item.key)}
 					renderItem={({item})=>(
 						<EviromentButton
 							title={item.title}
@@ -135,9 +143,11 @@ export function PlantSelect(){
 			<View style={styles.plants}>
 				<FlatList
 					data={filteredPlants}
+					keyExtractor={(item) => String(item.id)}
 					renderItem={({item})=>(
 						<PlantCartPrimary
 							data={item}
+							onPress={() => handlePlantSelect(item)}
 							/>
 					)}
 					showsVerticalScrollIndicator={false}
