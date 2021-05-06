@@ -8,13 +8,12 @@ import loadAnimation from '../assets/load.json';
 export function Load(){
 	return(
 		<View style={styles.container}>
-			{/* <LottieView
+			<LottieView
 				source={loadAnimation}
 				autoPlay
 				loop
 				style={styles.animation}
-			/> */}
-			<Text>Finge que é um loading</Text>
+			/>
 		</View>
 	)
 }

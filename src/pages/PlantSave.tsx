@@ -11,7 +11,7 @@ import  {
 	Image
 } from 'react-native';
 import { getBottomSpace } from 'react-native-iphone-x-helper';
-import { useRoute } from '@react-navigation/core';
+import { useNavigation, useRoute } from '@react-navigation/core';
 import DateTimePicker, { Event } from '@react-native-community/datetimepicker';
 import { format, isBefore } from 'date-fns';
 
@@ -22,28 +22,18 @@ import { Button } from '../components/Button';
 import colors from '../styles/colors';
 import fonts from '../styles/fonts';
 
-interface FrequencyProps {
-	times: number;
-	repeat_every: string;
-}
+import { PlantProps, savePlant } from '../libs/storage';
 
-interface PlantsProps {
-	plant: {
-		id: 1,
-      	name: string;
-      	about: string;
-      	water_tips:  string;
-      	photo:  string;
-      	environments: Array<string>;
-      	frequency: FrequencyProps;
-	}
+interface Params {
+	plant: PlantProps;
 }
 
 export function PlantSave(){
 	const route = useRoute();
-	const { plant } = route.params as PlantsProps;
+	const { plant } = route.params as Params;
 	const [ selectedDateTime, setSelectedDateTime ] = useState(new Date());
 	const [ showDatePicker, setShowDatePicker] = useState( Platform.OS == 'ios' );
+	const navigation = useNavigation();
 
 	function handleChangeTime(event: Event, dateTime: Date | undefined) {
 		if(Platform.OS == 'android'){
@@ -62,6 +52,28 @@ export function PlantSave(){
 	function handleOpenDateTimePickerAndroid(){
 		setShowDatePicker(oldState => !oldState);
 	}
+	async function handleSavePlant(){
+		// const dataTeste = await loadPlant();
+		// console.log(dataTeste);
+		// return true;
+		try {
+			await savePlant({
+				...plant,
+				dateTimeNotification: selectedDateTime
+			});
+
+			navigation.navigate('Confirmation',{
+				title: 'Tudo certo',
+				subTitle: 'Fique Tranquilo que sempre vamos lembrar você de cuidar da sua plantinha com muito cuidado',
+				buttonTitle: 'Muito Obrigado',
+				icon:'fest',
+				nextScreen: 'PlantSelect'
+			});
+		} catch (error) {
+			Alert.alert('Não foi possivel cadastrar a planta 🥲');
+		}
+	}
+
 	return(
 		<View style={styles.container}>
 			<View style={styles.plantInfo}>
@@ -107,14 +119,14 @@ export function PlantSave(){
 							style={styles.dataTimePickerButton}
 							>
 							<Text style={styles.dateTimePickerText}>
-								{`Mudar ${format(selectedDateTime, 'HH:mm')}}
+								{`Mudar ${format(selectedDateTime, 'HH:mm')}`}
 							</Text>
 						</TouchableOpacity>
 					)
 				}
 				<Button
 					title="Cadastrar Planta"
-					onPress={()=>{}}
+					onPress={handleSavePlant}
 				/>
 			</View>
 		</View>
