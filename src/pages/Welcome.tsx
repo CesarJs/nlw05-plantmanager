@@ -7,7 +7,8 @@ import {
 	StyleSheet,
 	TouchableOpacity,
 	Dimensions,
-	View
+	View,
+	ScrollView
 } from 'react-native';
 
 import { Feather } from '@expo/vector-icons';
@@ -22,38 +23,43 @@ export function Welcome() {
 		navigation.navigate('UserIndentification');
 	}
 	return (
-		<SafeAreaView style={styles.container}>
-			<View style={styles.wrapper}>
-				<Text style={styles.title}>
-					Gerencie {'\n'}
-					suas plantas {'\n'}
-					forma fácil
-				</Text>
+		<ScrollView
+			showsVerticalScrollIndicator={false}
+			contentContainerStyle={styles.container}
+		>
+			<SafeAreaView style={styles.container}>
+				<View style={styles.wrapper}>
+					<Text style={styles.title}>
+						Gerencie {'\n'}
+						suas plantas {'\n'}
+						forma fácil
+					</Text>
 
-				<Image
-					source={wateringImg}
-					style={styles.img}
-					resizeMode="contain"
-					/>
-
-				<Text style={styles.subtitle}>
-					Não esqueça mais de regar suas plantas. Nós cuidamos de lembrar
-					sempre que precisar.
-				</Text>
-
-				<TouchableOpacity
-					style={styles.button}
-					activeOpacity={0.7}
-					onPress={handleStart}
-					>
-					<Feather
-						style={styles.buttonIcon}
-						name={'chevron-right'}
+					<Image
+						source={wateringImg}
+						style={styles.img}
+						resizeMode="contain"
 						/>
-				</TouchableOpacity>
-			</View>
 
-		</SafeAreaView>
+					<Text style={styles.subtitle}>
+						Não esqueça mais de regar suas plantas. Nós cuidamos de lembrar
+						sempre que precisar.
+					</Text>
+
+					<TouchableOpacity
+						style={styles.button}
+						activeOpacity={0.7}
+						onPress={handleStart}
+						>
+						<Feather
+							style={styles.buttonIcon}
+							name={'chevron-right'}
+							/>
+					</TouchableOpacity>
+				</View>
+
+			</SafeAreaView>
+		</ScrollView>
 	)
 }
 
@@ -70,7 +76,6 @@ const styles = StyleSheet.create({
 	},
 	title:{
 		fontSize: 28,
-		fontWeight: 'bold',
 		textAlign: 'center',
 		color: colors.heading,
 		marginTop: 38,
@@ -82,14 +87,15 @@ const styles = StyleSheet.create({
 		fontSize: 18,
 		paddingHorizontal: 20,
 		color: colors.heading,
-		fontFamily: fonts.text
+		fontFamily: fonts.text,
+		marginBottom: 70
 	},
 	button:{
 		backgroundColor: colors.green,
 		justifyContent: 'center',
 		alignItems: 'center',
 		borderRadius: 16,
-		marginBottom: 10,
+		marginBottom: 15,
 		height: 56,
 		width: 56
 	},

@@ -4,7 +4,8 @@ import {
 	StyleSheet,
 	View,
 	Text,
-	Image
+	Image,
+	Alert
 } from 'react-native';
 
 import { Header } from '../components/Header';
@@ -12,34 +13,65 @@ import { Header } from '../components/Header';
 import WaterDrop from '../assets/waterdrop.png';
 import colors from '../styles/colors';
 import { FlatList } from 'react-native-gesture-handler';
-import { loadPlant, PlantProps } from '../libs/storage';
+import { loadPlant, PlantProps, removePlant } from '../libs/storage';
 import { formatDistance } from 'date-fns/esm';
-import { pt } from 'date-fns/locale';
+import { id, pt } from 'date-fns/locale';
 import fonts from '../styles/fonts';
 import { PlantCardScondary } from '../components/PlantCardScondary';
+import { Load } from '../components/Load';
+
 
 
 export function MyPlants(){
 
 	const [ myPlants, setMyPlants] = useState<PlantProps[]>([]);
-	const [ loadgin, setLoadig ] = useState(true);
+	const [ loading, setLoadig ] = useState(true);
 	const [ nextWatered , setNextWatered ] = useState<string>();
 
+	function handleRemove(plant:PlantProps){
+		Alert.alert('Remover', `Deseja remover a ${plant.name} ?`, [
+			{
+				text: 'Não 🙏🏼',
+				style: 'cancel'
+			},
+			{
+				text: 'Sim 😮‍💨',
+				onPress: async() => {
+					try {
+						await removePlant(String(plant.id));
+						setMyPlants( (oldData) =>  oldData.filter((item) => item.id !== plant.id) );
+
+					} catch (error) {
+						Alert.alert('Não foi possivel remover! 😮‍💨');
+					}
+				}
+			}
+		]);
+	}
 	useEffect(() => {
 		async function loadStoragedData(){
 			const plantsStorage = await loadPlant();
-			const nextTime = formatDistance(
-				new Date(plantsStorage[0].dateTimeNotification).getTime(),
-				new Date().getTime(),
-				{ locale: pt }
-			);
+			if(plantsStorage.length > 0){
+				const nextTime = formatDistance(
+					new Date(plantsStorage[0].dateTimeNotification).getTime(),
+					new Date().getTime(),
+					{ locale: pt }
+					);
+				setNextWatered(`Não esquece de regar a ${plantsStorage[0].name} à ${nextTime} horas`);
+			}else{
+				setNextWatered(`Cadastre uma planta em "Nova Planta"`);
 
-			setNextWatered(`Não esquece de regar a ${plantsStorage[0].name} à ${nextTime} horas`);
+			}
+
 			setMyPlants(plantsStorage);
 			setLoadig(false);
 		}
 		loadStoragedData();
 	}, []);
+
+	if(loading) {
+		return <Load />
+	}
 
 	return (
 		<View style={styles.container}>
@@ -61,7 +93,9 @@ export function MyPlants(){
 					data={myPlants}
 					keyExtractor={(item) => String(item.id)}
 					renderItem={({item}) => (
-						<PlantCardScondary data={item} />
+						<PlantCardScondary
+							handleRemove={() => handleRemove(item)}
+							data={item} />
 					)}
 					showsVerticalScrollIndicator={false}
 					contentContainerStyle={{flex: 1}}

@@ -58,6 +58,9 @@ export function PlantSelect(){
 	async function fechPlants(){
 
 		const { data } = await api.get(`plants?_sort=name&_order=asc&_page=${page}&_limit=8`);
+		if(page === null){
+			return false;
+		}
 		if(!data){
 			return setLoading(true);
 		}
